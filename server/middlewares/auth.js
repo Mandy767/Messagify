@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { id } = jwt.verify(token, JWT_SECRET || "somesecret");
+    const { id } = jwt.verify(token, JWT_SECRET);
     const user = await userServices.getUserById(id);
 
     if (!user) {
@@ -21,7 +21,7 @@ module.exports = async (req, res, next) => {
     }
 
     req.session.user = user;
-    if (user.username === ADMIN_USERNAME || "admin") {
+    if (user.username === ADMIN_USERNAME) {
       req.session.user.isAdmin = true;
     }
     next();

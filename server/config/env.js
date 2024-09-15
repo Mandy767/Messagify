@@ -4,7 +4,7 @@ const { PORT, MONGODB_URI, JWT_SECRET, JWT_EXPIRY, ADMIN_USERNAME } =
   process.env;
 
 const config = {
-  PORT: PORT || 3000,
+  PORT: PORT,
   MONGODB_URI,
   JWT_SECRET,
   JWT_EXPIRY,

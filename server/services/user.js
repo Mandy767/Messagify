@@ -29,7 +29,7 @@ class UserService {
 
     if (!isValid) throw new Error("Invalid password");
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET || "somesecret");
+    const token = jwt.sign({ id: user._id }, JWT_SECRET);
 
     return token;
   }
@@ -39,7 +39,7 @@ class UserService {
   }
 
   async updateAdminPassword(password) {
-    const admin = await User.findOne({ username: ADMIN_USERNAME || "admin" });
+    const admin = await User.findOne({ username: ADMIN_USERNAME });
 
     admin.password = password;
 

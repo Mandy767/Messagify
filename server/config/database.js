@@ -3,10 +3,7 @@ const MongoStore = require("connect-mongo");
 
 const { MONGODB_URI } = require("./env");
 
-mongoose.connect(
-  MONGODB_URI ||
-    "mongodb+srv://mandar767:mandar2586@mandar.7wcjdwj.mongodb.net/messagify"
-);
+mongoose.connect(MONGODB_URI);
 
 const db = mongoose.connection;
 

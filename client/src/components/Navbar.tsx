@@ -2,10 +2,20 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-scroll';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { Button } from './ui/button';
+import { useAuth } from '@/store/AuthContext';
 
-function Navbar() {
+function Navbar({ islanding }) {
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
+    const { isAuthenticated, user } = useAuth();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
+    };
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -22,69 +32,153 @@ function Navbar() {
                     </h1>
                 </div>
 
-                {/* Hamburger Icon for Mobile */}
-                <div className="md:hidden flex items-center">
-                    <button onClick={toggleMenu}>
-                        {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-                    </button>
+                <div className="md:hidden flex items-center justify-center">
+                    <div onClick={toggleMenu}>
+                        {isOpen ? (
+                            <FaTimes size={24} />
+                        ) : isAuthenticated ? (
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-900">
+                                    <img
+                                        src={user?.profilePicture || '/default-profile-pic.png'}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <FaBars size={24} />
+                        )}
+
+                    </div>
                 </div>
 
-                {/* Links for larger screens */}
-                <ul className="hidden md:flex space-x-6">
-                    <li>
-                        <Link to="home" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
-                            Home
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="features" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
-                            Features
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="contact" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
-                            Contact
-                        </Link>
-                    </li>
-                </ul>
+                {/* Links and Profile for larger screens */}
+                <div className="hidden md:flex items-center space-x-6">
+                    {islanding && (
+                        <>
+                            <Link to="home" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
+                                Home
+                            </Link>
+                            <Link to="features" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
+                                Features
+                            </Link>
+                            <Link to="contact" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
+                                Contact
+                            </Link>
+                        </>
+                    )}
+
+                    {isAuthenticated ? (
+                        <div className="flex items-center">
+                            {/* Profile Picture */}
+                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-900">
+                                <img src={user?.profilePicture || '/default-profile-pic.png'} alt="Profile" className="w-full h-full object-cover" />
+                            </div>
+                            {/* User Name and Dropdown */}
+                            <div className="ml-4 relative">
+                                <button
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    className="flex items-center text-gray-900 font-semibold">
+                                    <span>{user?.name}</span>
+                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                {/* Dropdown Menu */}
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-center space-x-4 p-1">
+                            <Button className="border-black h-8" variant="outline" onClick={() => navigate('/login')}>Login</Button>
+                            <Button className="h-8" onClick={() => navigate('/register')}>Register</Button>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Dropdown Menu for Mobile */}
+            {/* Mobile Menu */}
             {isOpen && (
-                <ul className="md:hidden flex flex-col items-center bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] text-gray-800 py-2 shadow-md ">
-                    <li className="py-2 w-full text-center border-b-2">
-                        <Link
-                            onClick={toggleMenu}
-                            to="home"
-                            smooth={true}
-                            duration={500}
-                            className="hover:text-black text-gray-800 cursor-pointer block w-full"
-                        >
-                            Home
-                        </Link>
-                    </li>
-                    <li className="py-2 w-full text-center border-b-2">
-                        <Link
-                            onClick={toggleMenu}
-                            to="features"
-                            smooth={true}
-                            duration={500}
-                            className="hover:text-black text-gray-800 cursor-pointer block w-full"
-                        >
-                            Features
-                        </Link>
-                    </li>
-                    <li className="py-2 w-full text-center">
-                        <Link
-                            onClick={toggleMenu}
-                            to="contact"
-                            smooth={true}
-                            duration={500}
-                            className="hover:text-black text-gray-800 cursor-pointer block w-full"
-                        >
-                            Contact
-                        </Link>
-                    </li>
+                <ul className="md:hidden flex flex-col items-center bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] text-gray-800 py-4 shadow-lg rounded-lg">
+                    <div className="w-full border-b-2 border-gray-300 mb-2"></div>
+                    {islanding && (
+                        <>
+                            <li className="w-full text-center py-3 border-b-2 border-gray-300">
+                                <Link
+                                    onClick={toggleMenu}
+                                    to="home"
+                                    smooth={true}
+                                    duration={500}
+                                    className="hover:text-blue-600 text-gray-800 cursor-pointer block w-full transition-colors duration-300"
+                                >
+                                    Home
+                                </Link>
+                            </li>
+                            <li className="w-full text-center py-3 border-b-2 border-gray-300">
+                                <Link
+                                    onClick={toggleMenu}
+                                    to="features"
+                                    smooth={true}
+                                    duration={500}
+                                    className="hover:text-blue-600 text-gray-800 cursor-pointer block w-full transition-colors duration-300"
+                                >
+                                    Features
+                                </Link>
+                            </li>
+                            <li className="w-full text-center py-3 border-b-2 border-gray-300">
+                                <Link
+                                    onClick={toggleMenu}
+                                    to="contact"
+                                    smooth={true}
+                                    duration={500}
+                                    className="hover:text-blue-600 text-gray-800 cursor-pointer block w-full transition-colors duration-300"
+                                >
+                                    Contact
+                                </Link>
+                            </li>
+                        </>
+                    )}
+
+                    {isAuthenticated ? (
+                        <li className="w-full text-center py-3">
+                            <Button className="border-black h-8" onClick={async () => {
+                                await logout();
+                                navigate('/');
+                            }}>Logout</Button>
+                        </li>
+                    ) : (
+                        <>
+                            <li className="w-full text-center py-3 border-b-2 border-gray-300">
+                                <Button
+                                    variant="outline"
+                                    className="border-black py-2 px-6 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                                    onClick={() => {
+                                        toggleMenu();
+                                        navigate('/login');
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                            </li>
+                            <li className="w-full text-center py-3">
+                                <Button
+                                    className="py-2 px-6 rounded-md shadow-md hover:bg-green-600 transition-all duration-300"
+                                    onClick={() => navigate('/register')}
+                                >
+                                    Register
+                                </Button>
+                            </li>
+                        </>
+                    )}
                 </ul>
             )}
         </nav>

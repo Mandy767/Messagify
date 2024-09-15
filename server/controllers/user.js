@@ -17,7 +17,7 @@ exports.loginUser = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const token = await userServices.loginUser(username, password);
-    const type = ADMIN_USERNAME || "admin" === username ? "admin" : "user";
+    const type = ADMIN_USERNAME === username ? "admin" : "user";
 
     res.cookie("token", token, { httpOnly: true });
     res.status(200).json({ token, type });
@@ -41,7 +41,7 @@ exports.getMe = async (req, res, next) => {
   try {
     const { _id } = req.session.user;
     const user = await userServices.getUserById(_id);
-    const type = ADMIN_USERNAME || "admin" === user.username ? "admin" : "user";
+    const type = ADMIN_USERNAME === user.username ? "admin" : "user";
     res.status(200).json({
       user,
       type,
