@@ -1,13 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
+
 import { useAuth } from '@/store/AuthContext';
 import { Loader } from 'lucide-react'; // Assuming you're using the Loader component from lucide-react
+import { useNavbar } from '@/store/NavbarContext';
+import { useEffect } from 'react';
 
 function LandingPage() {
     const navigate = useNavigate();
     const { isAuthenticated, isLoading } = useAuth();
+    const { setIslanding } = useNavbar()
+
+    useEffect(() => {
+        setIslanding(true);
+    }, [setIslanding]);
 
     if (isLoading) {
         return (
@@ -20,7 +26,7 @@ function LandingPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2]">
-            <Navbar islanding={true} />
+
             <main className="flex-grow ">
                 {/* Home Section */}
                 <section id="home" className="flex items-center justify-center h-screen">
@@ -62,7 +68,6 @@ function LandingPage() {
                 </section>
             </main>
 
-            <Footer />
         </div>
     );
 }

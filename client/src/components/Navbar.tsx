@@ -4,13 +4,16 @@ import { Link } from 'react-scroll';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { Button } from './ui/button';
 import { useAuth } from '@/store/AuthContext';
+import { useNavbar } from '@/store/NavbarContext';
 
-function Navbar({ islanding }) {
+function Navbar() {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
+    const { islanding } = useNavbar()
     const { isAuthenticated, user } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
 
     const handleLogout = async () => {
         await logout();
@@ -39,7 +42,7 @@ function Navbar({ islanding }) {
                             <div className="flex items-center">
                                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-900">
                                     <img
-                                        src={import.meta.env.VITE_SERVER_ENDPOINT + "/" + user.profilepic}
+                                        src={import.meta.env.VITE_SERVER_ENDPOINT + "/" + user?.profilepic}
                                         alt="Profile"
                                         className="w-full h-full object-cover rounded-full"
                                     />
@@ -71,7 +74,7 @@ function Navbar({ islanding }) {
                         <div className="flex items-center">
 
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-900">
-                                <img src={import.meta.env.VITE_SERVER_ENDPOINT + "/" + user.profilepic} alt="Profile" className="w-full h-full object-cover" />
+                                <img src={import.meta.env.VITE_SERVER_ENDPOINT + "/" + user?.profilepic} alt="Profile" className="w-full h-full object-cover" />
                             </div>
 
                             <div className="ml-4 relative">

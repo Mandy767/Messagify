@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { useHttpRequest } from "@/hooks/httpClient";
 import dispatchMessage from "@/hooks/messageHandler";
 import { useNavigate } from "react-router-dom";
+import { useNavbar } from "@/store/NavbarContext";
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -16,7 +15,11 @@ function RegisterPage() {
     const [password, setPassword] = useState("");
     const [confirmpassword, setConfirmPassword] = useState("");
     const [profilePic, setProfilePic] = useState<File | null>(null);
+    const { setIslanding } = useNavbar()
 
+    useEffect(() => {
+        setIslanding(false);
+    }, [setIslanding]);
     const registerHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -53,7 +56,7 @@ function RegisterPage() {
 
     return (
         <>
-            <Navbar islanding={false} />
+
             <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] p-8 rounded-lg shadow-lg border-gray-400 border-2">
                     <h2 className="text-center text-2xl font-bold text-gray-900">Create your account</h2>
@@ -136,7 +139,7 @@ function RegisterPage() {
                     </form>
                 </div>
             </div>
-            <Footer />
+
         </>
     );
 }
