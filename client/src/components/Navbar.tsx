@@ -116,8 +116,14 @@ function Navbar() {
                             </div>
                         ) : (
                             <div className="flex items-center justify-center space-x-4 p-1">
-                                <Button className="border-black h-8" variant="outline" onClick={() => navigate('/login')}>Login</Button>
-                                <Button className="h-8" onClick={() => navigate('/register')}>Register</Button>
+                                <Button className="border-black h-8" variant="outline" onClick={() => {
+                                    toggleMenu()
+                                    navigate('/login')
+                                }}>Login</Button>
+                                <Button className="h-8" onClick={() => {
+                                    toggleMenu()
+                                    navigate('/register')
+                                }}>Register</Button>
                             </div>
                         )}
                     </div>
@@ -167,17 +173,14 @@ function Navbar() {
 
                         {isAuthenticated ? (
                             <li className="w-full text-center py-3">
-                                <Button className="border-black h-8" onClick={async () => {
-                                    await logout();
-                                    navigate('/');
-                                }}>Logout</Button>
+                                <Button className="border-black h-8" onClick={handleLogout}>Logout</Button>
                             </li>
                         ) : (
                             <>
                                 <li className="w-full text-center py-3 border-b-2 border-gray-300">
                                     <Button
                                         variant="outline"
-                                        className="border-black py-2 px-6 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                                        className="border-black py-2 px-6 rounded-md shadow-md "
                                         onClick={() => {
                                             toggleMenu();
                                             navigate('/login');
@@ -188,8 +191,11 @@ function Navbar() {
                                 </li>
                                 <li className="w-full text-center py-3">
                                     <Button
-                                        className="py-2 px-6 rounded-md shadow-md hover:bg-green-600 transition-all duration-300"
-                                        onClick={() => navigate('/register')}
+                                        className="py-2 px-6 rounded-md shadow-md "
+                                        onClick={() => {
+                                            toggleMenu()
+                                            navigate('/register')
+                                        }}
                                     >
                                         Register
                                     </Button>
@@ -198,7 +204,7 @@ function Navbar() {
                         )}
                     </ul>
                 )}
-            </nav>
+            </nav >
             <LogoutModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
