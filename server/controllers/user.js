@@ -6,7 +6,11 @@ const userServices = new UserServices();
 exports.registerUser = async (req, res, next) => {
   try {
     const userData = req.body;
-    const newUser = await userServices.createUser(userData);
+    console.log(userData);
+    const newUser = await userServices.createUser({
+      ...userData,
+      profilepic: req?.file?.path,
+    });
     res.status(201).json(newUser);
   } catch (err) {
     next(err);
@@ -41,10 +45,14 @@ exports.getMe = async (req, res, next) => {
   try {
     const { _id } = req.session.user;
     const user = await userServices.getUserById(_id);
+
+    const profile = user.profilepic;
+    console.log(profile);
     const type = ADMIN_USERNAME === user.username ? "admin" : "user";
     res.status(200).json({
       user,
       type,
+      profile,
     });
   } catch (err) {
     next(err);

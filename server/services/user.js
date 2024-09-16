@@ -11,6 +11,7 @@ class UserService {
       name: joi.string().required(),
       username: joi.string().required(),
       password: joi.string().required(),
+      profilepic: joi.string().required(),
     });
     return schema.validate(userData);
   }

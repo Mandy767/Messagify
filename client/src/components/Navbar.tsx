@@ -24,7 +24,6 @@ function Navbar({ islanding }) {
     return (
         <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] text-gray-600 shadow-md z-50">
             <div className="container mx-auto flex items-center justify-between p-4">
-                {/* Logo and title */}
                 <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
                     <img src="/speech-bubble.png" alt="Logo" className="h-8 w-8 mr-2" />
                     <h1 className="text-2xl font-bold text-gray-900 select-none">
@@ -40,7 +39,7 @@ function Navbar({ islanding }) {
                             <div className="flex items-center">
                                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-900">
                                     <img
-                                        src={user?.profilePicture || '/default-profile-pic.png'}
+                                        src={import.meta.env.VITE_SERVER_ENDPOINT + "/" + user.profilepic}
                                         alt="Profile"
                                         className="w-full h-full object-cover rounded-full"
                                     />
@@ -53,7 +52,6 @@ function Navbar({ islanding }) {
                     </div>
                 </div>
 
-                {/* Links and Profile for larger screens */}
                 <div className="hidden md:flex items-center space-x-6">
                     {islanding && (
                         <>
@@ -71,11 +69,11 @@ function Navbar({ islanding }) {
 
                     {isAuthenticated ? (
                         <div className="flex items-center">
-                            {/* Profile Picture */}
+
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-900">
-                                <img src={user?.profilePicture || '/default-profile-pic.png'} alt="Profile" className="w-full h-full object-cover" />
+                                <img src={import.meta.env.VITE_SERVER_ENDPOINT + "/" + user.profilepic} alt="Profile" className="w-full h-full object-cover" />
                             </div>
-                            {/* User Name and Dropdown */}
+
                             <div className="ml-4 relative">
                                 <button
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -85,7 +83,7 @@ function Navbar({ islanding }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
-                                {/* Dropdown Menu */}
+
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
                                         <button

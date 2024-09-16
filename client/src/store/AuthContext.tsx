@@ -49,7 +49,8 @@ export const AuthProvider = ({ children }: any) => {
             let res = await sendRequest("/api/user/me");
             if (res.data) {
                 login();
-                setUser(res.data.user); // Adjust based on actual response structure
+                setUser(res.data.user);
+
             } else {
                 setIsAuthenticated(false);
             }

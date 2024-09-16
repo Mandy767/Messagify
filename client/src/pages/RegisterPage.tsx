@@ -15,6 +15,7 @@ function RegisterPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmpassword, setConfirmPassword] = useState("");
+    const [profilePic, setProfilePic] = useState<File | null>(null);
 
     const registerHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,14 +30,16 @@ function RegisterPage() {
             return;
         }
 
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("username", username);
+        formData.append("password", password);
+        formData.append("profilepic", profilePic as Blob);
+
         try {
             const data = await sendRequest("/api/user/register", {
                 method: "POST",
-                body: JSON.stringify({
-                    name: name,
-                    username: username,
-                    password: password,
-                }),
+                body: formData,
             });
 
             if (data) {
@@ -108,6 +111,18 @@ function RegisterPage() {
                                     value={confirmpassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     placeholder="Confirm your password"
+                                    className="mt-1 block w-full border-black"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="profile-pic" className="block text-sm font-medium text-gray-700">
+                                    Profile Picture
+                                </Label>
+                                <Input
+                                    type="file"
+                                    id="profile-pic"
+                                    accept="image/*"
+                                    onChange={(e) => setProfilePic(e.target.files?.[0] || null)}
                                     className="mt-1 block w-full border-black"
                                 />
                             </div>
