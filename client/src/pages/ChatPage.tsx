@@ -1,75 +1,111 @@
-import { Button } from '@/components/ui/button';
 import { useHttpRequest } from '@/hooks/httpClient';
 import { useAuth } from '@/store/AuthContext';
 import { useNavbar } from '@/store/NavbarContext';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 
-
-const receiver = {
-    username: 'User2',
-    profilePicture: 'https://via.placeholder.com/40',
-};
-
-const socket = io('http://localhost:3000');
-
 function ChatPage() {
-    const { userId2: friendId } = useParams()
+    const [socket, setSocket] = useState(null);
+    const { userId2: friendId } = useParams();
     const [friendData, setFriendData] = useState(null);
+    const [pastMessages, setPastMessages] = useState();
+
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
-    const { user } = useAuth()
+    const { user } = useAuth();
     const username = user.username;
-    const sendRequest = useHttpRequest()
+    const sendRequest = useHttpRequest();
     const { setIslanding } = useNavbar();
 
+    const handleSocket = useCallback(() => {
+        const socketInstance = io('http://localhost:3000', {
+            extraHeaders: {
+                Authorization: user._id,
+
+            }
+        });
+
+        setSocket(socketInstance);
+
+        return () => {
+            socketInstance.disconnect();
+        };
+    }, []);
+
     useEffect(() => {
+        const cleanupSocket = handleSocket();
         setIslanding(false);
+
+        return () => {
+            if (cleanupSocket) cleanupSocket();
+        };
     }, []);
 
     const fetchFriend = useCallback(async () => {
         if (!friendId) return;
         try {
             const data = await sendRequest(`/api/user/friend/${friendId}`, { method: "GET" });
-
-            setFriendData(data.data)
-
+            setFriendData(data.data);
         } catch (err) {
             console.error('Error fetching friend:', err);
         }
     }, []);
 
+
+    const requestPastMessages = useCallback(() => {
+        if (socket && friendId) {
+            socket.emit('get_messages', { userId1: user._id, userId2: friendId }, (response) => {
+                if (response?.messages) {
+                    setChat(response.messages);
+
+                }
+            });
+        }
+    }, [socket, user._id, friendId]);
+
     useEffect(() => {
-        fetchFriend()
+        fetchFriend();
+        requestPastMessages();
 
-        socket.on('receiveMessage', (data) => {
-            setChat((prevChat) => [...prevChat, data]);
-        });
+        if (socket) {
+            console.log('socket connected')
+            socket.on('receive_message', (data) => {
+                console.log(data)
+                setChat((prevChat) => [...prevChat, data]);
+            });
 
-        return () => {
-            socket.off('receiveMessage');
-        };
-    }, []);
+            return () => {
+                socket.off('receive_message');
+            };
+        } else {
+            console.log('socket not connected')
+        }
+    }, [socket]);
 
     const handleSendMessage = () => {
         if (message.trim()) {
             const newMessage = {
-                username,
-                message,
-                timestamp: new Date(),
+                sender: user._id,
+                recipient: friendId,
+                content: message,
             };
-            // Emit the message to the server
-            socket.emit('sendMessage', newMessage);
-            setChat((prevChat) => [...prevChat, newMessage]);
-            setMessage(''); // Clear the input after sending
+
+
+            if (socket) {
+                console.log(newMessage);
+                socket.emit('send_message', newMessage);
+                setChat((prevChat) => [...prevChat, newMessage]);
+                setMessage('');
+            }
         }
     };
 
+
     return (
-        <div className="chat-page h-screen flex flex-col">
+        <div className="chat-page h-screen flex flex-col ">
             {/* Navbar component for receiver info */}
-            <div className="navbar bg-blue-600 text-white pl-5 p-4 pt-8 flex items-center">
+            <div className="navbar bg-blue-600 text-white pl-5 p-4 pt-8 flex items-center ">
                 <img
                     src={`${import.meta.env.VITE_SERVER_ENDPOINT}/${friendData?.profilepic}`}
                     alt={friendData?.username}
@@ -79,20 +115,30 @@ function ChatPage() {
                     <div className="font-bold text-lg">{friendData?.username}</div>
                     <div className="text-sm text-gray-200">Online</div>
                 </div>
-
             </div>
 
-            <div className="chat-container p-4 flex-grow flex flex-col">
+            <div className="chat-container p-4 flex-grow overflow-y-scroll flex flex-col">
                 <div className="chat-window border border-gray-300 rounded-lg p-4 mb-4 h-full overflow-y-scroll">
                     {chat.map((msg, index) => (
-                        <div key={index} className={`message ${msg.username === username ? 'self-end' : 'self-start'} mb-2`}>
-                            <div className="text-xs text-gray-500">{msg.username}</div>
-                            <div className={`p-2 rounded-lg ${msg.username === username ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                                {msg.message}
+                        <div key={index} className={`flex ${msg.sender !== user._id ? 'justify-start' : 'justify-end'} mb-2`}>
+                            <div className='flex flex-col space-y-1 max-w-xs'>
+                                {/* Message bubble */}
+                                <div className={`p-2 rounded-lg ${msg.sender === user._id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                                    {msg.content}
+                                </div>
+                                {/* Timestamp */}
+                                <div className={`text-xs text-gray-500 ${msg.sender === user._id ? 'text-right' : 'text-left'}`}>
+                                    {new Date(msg.createdAt).toLocaleTimeString('en-US', {
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        hour12: true
+                                    })}
+                                </div>
                             </div>
-                            <div className="text-xs text-gray-400">{new Date(msg.timestamp).toLocaleTimeString()}</div>
                         </div>
                     ))}
+
+
                 </div>
                 <div className="chat-input flex">
                     <input
