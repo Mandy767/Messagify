@@ -10,6 +10,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './store/PrivateRoutes';
 import Layout from './layout/Layout';
 import { NavbarProvider } from './store/NavbarContext';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="/login" element={<ProtectedRoute><LoginPage /></ProtectedRoute>} />
               <Route path="/register" element={<ProtectedRoute><RegisterPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/chat/:userId1/:userId2" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
             </Routes>
           </Layout>
           <ToastContainer

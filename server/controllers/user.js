@@ -138,3 +138,19 @@ exports.getAllUsersExceptSelf = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getFriendById = async (req, res, next) => {
+  try {
+    const friendId = req.params.id;
+
+    const friend = await User.findById(friendId).select("-password");
+
+    if (!friend) {
+      return res.status(404).json({ message: "Friend not found" });
+    }
+
+    res.status(200).json(friend);
+  } catch (err) {
+    next(err);
+  }
+};

@@ -20,6 +20,8 @@ router.post("/friends", authMiddleware, userController.getFriends);
 
 router.get("/users", authMiddleware, userController.getAllUsersExceptSelf);
 
+router.get("/friend/:id", authMiddleware, userController.getFriendById);
+
 module.exports = {
   use: "/user",
   router,
