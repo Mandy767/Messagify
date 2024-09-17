@@ -53,19 +53,20 @@ function ChatPage() {
     }, []);
 
 
-    const requestPastMessages = useCallback(() => {
-        if (socket && friendId) {
-            socket.emit('get_messages', { userId1: user._id, userId2: friendId }, (response) => {
-                if (response?.messages) {
-                    setChat(response.messages);
+    const requestPastMessages = useCallback(async () => {
+        try {
+            const data = await sendRequest(`/api/message/messages/${user._id}/${friendId}`, { method: "GET" });
+            setChat(data.data.messages)
 
-                }
-            });
+
+        } catch (err) {
+            console.error('Error fetching friend:', err);
         }
-    }, [socket, user._id, friendId]);
+    }, []);
 
     useEffect(() => {
         fetchFriend();
+        console.log("here")
         requestPastMessages();
 
         if (socket) {
