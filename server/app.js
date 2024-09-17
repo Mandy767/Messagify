@@ -19,7 +19,7 @@ app.use(cookieParser(env.JWT_SECRET));
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: ["http://localhost:5173"],
     credentials: true, // Access-control-allow-credentials:true
     optionSuccessStatus: 200,
   })
@@ -49,4 +49,4 @@ app.use(errorHandler.get404);
 app.use(errorHandler.global);
 
 // Export the app and the server
-module.exports = { app }; // Export both app and server
+module.exports = { app, server }; // Export both app and server

@@ -5,13 +5,8 @@ const messageServices = new MessageServices();
 module.exports = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: "http://localhost:5173",
     },
-  });
-
-  io.use((socket, next) => {
-    const cookieParser = require("cookie-parser");
-    cookieParser("your-session-secret")(socket.request, {}, next);
   });
 
   io.on("connection", (socket) => {

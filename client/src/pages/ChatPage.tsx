@@ -12,7 +12,7 @@ const receiver = {
     profilePicture: 'https://via.placeholder.com/40',
 };
 
-const socket = io('http://localhost:5000');
+const socket = io('http://localhost:3000');
 
 function ChatPage() {
     const { userId2: friendId } = useParams()
@@ -20,7 +20,7 @@ function ChatPage() {
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
     const { user } = useAuth()
-    const [username, setUsername] = useState(user.username);
+    const username = user.username;
     const sendRequest = useHttpRequest()
     const { setIslanding } = useNavbar();
 
@@ -42,7 +42,7 @@ function ChatPage() {
 
     useEffect(() => {
         fetchFriend()
-        // Receive messages from the server
+
         socket.on('receiveMessage', (data) => {
             setChat((prevChat) => [...prevChat, data]);
         });
@@ -82,7 +82,6 @@ function ChatPage() {
 
             </div>
 
-            {/* Chat window */}
             <div className="chat-container p-4 flex-grow flex flex-col">
                 <div className="chat-window border border-gray-300 rounded-lg p-4 mb-4 h-full overflow-y-scroll">
                     {chat.map((msg, index) => (
