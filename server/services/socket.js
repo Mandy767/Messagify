@@ -2,6 +2,9 @@ const { Server } = require("socket.io");
 const MessageServices = require("./message");
 const messageServices = new MessageServices();
 
+// Create a mapping between userId and socketId
+const userSocketMap = new Map();
+
 module.exports = (server) => {
   const io = new Server(server, {
     cors: {
@@ -14,6 +17,14 @@ module.exports = (server) => {
 
     const session = socket.request.session;
     if (session && session.user) {
+      const userId = session.user._id;
+
+      // Map the userId to the socketId
+      userSocketMap.set(userId, socket.id);
+
+      // Join a room for the user
+      socket.join(userId);
+
       console.log("User session:", session.user);
     }
 
@@ -21,17 +32,23 @@ module.exports = (server) => {
       const { recipientId, content } = data;
       const senderId = session.user._id;
 
+      // Create a unique room name for the conversation
+      const roomName = [senderId, recipientId].sort().join("_");
+
       try {
         const message = await messageServices.createMessage(
           senderId,
           recipientId,
           content
         );
-        io.to(recipientId).emit("receive_message", {
+
+        // Emit the message to the room
+        io.to(roomName).emit("receive_message", {
           senderId,
           content,
           timestamp: message.createdAt,
         });
+
         callback({ status: "success" });
       } catch (err) {
         console.error("Error sending message:", err);
@@ -55,6 +72,12 @@ module.exports = (server) => {
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
+
+      // Remove the userId from the map and leave their room
+      if (session && session.user) {
+        userSocketMap.delete(session.user._id);
+        socket.leave(session.user._id);
+      }
     });
   });
 
