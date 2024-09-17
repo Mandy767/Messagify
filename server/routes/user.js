@@ -13,6 +13,9 @@ router.get("/me", authMiddleware, userController.getMe);
 router.post("/admin/password", isAdmin, userController.updateAdminPassword);
 
 router.post("/addFriend", authMiddleware, userController.addFriend);
+
+router.post("/removeFriend", authMiddleware, userController.removeFriend);
+
 router.post("/friends", authMiddleware, userController.getFriends);
 
 router.get("/users", authMiddleware, userController.getAllUsersExceptSelf);

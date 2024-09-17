@@ -84,21 +84,42 @@ exports.addFriend = async (req, res) => {
   }
 };
 
+exports.removeFriend = async (req, res) => {
+  const { userId, friendId } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { friends: friendId } },
+      { new: true }
+    );
+
+    await User.findByIdAndUpdate(
+      friendId,
+      { $pull: { friends: userId } },
+      { new: true }
+    );
+
+    return res.status(200).json({ message: "Friend removed successfully!" });
+  } catch (error) {
+    console.error("Error removing friend:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.getFriends = async (req, res) => {
   try {
     const { userId } = req.body;
     console.log(userId);
     const user = await User.findById(userId).populate(
       "friends",
-      "name username"
+      "name username profilepic"
     );
 
-    // Check if the user exists
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Return the user's friends
     return res.status(200).json(user.friends);
   } catch (error) {
     console.error("Error fetching friends: ", error);

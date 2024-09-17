@@ -46,6 +46,7 @@ function LoginPage() {
                 dispatchMessage("success", "Login successful");
                 login(); // Set the user as authenticated
                 navigate("/dashboard"); // Redirect to dashboard
+                window.location.reload()
             } else {
                 dispatchMessage("error", data.message);
             }

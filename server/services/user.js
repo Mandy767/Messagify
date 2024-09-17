@@ -52,7 +52,13 @@ class UserService {
 
   async getAllUsersExcept(excludeUserId) {
     try {
-      return await User.find({ _id: { $ne: excludeUserId } });
+      const user = await User.findById(excludeUserId).select("friends");
+
+      const friendIds = user.friends || [];
+
+      return await User.find({
+        _id: { $nin: [excludeUserId, ...friendIds] },
+      });
     } catch (error) {
       throw new Error("Error fetching users: " + error.message);
     }
