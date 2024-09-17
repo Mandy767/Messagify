@@ -1,0 +1,18 @@
+meta {
+  name: Login 2nd user
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:3000/api/user/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username":"nami888",
+    "password":"123"
+  }
+}

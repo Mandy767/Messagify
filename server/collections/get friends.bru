@@ -1,0 +1,17 @@
+meta {
+  name: get friends
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:3000/api/user/friends
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId":"66e92f35c445d0acee8e1f48"
+  }
+}

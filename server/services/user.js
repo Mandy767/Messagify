@@ -12,6 +12,7 @@ class UserService {
       username: joi.string().required(),
       password: joi.string().required(),
       profilepic: joi.string().required(),
+      friends: joi.array(),
     });
     return schema.validate(userData);
   }
@@ -47,6 +48,14 @@ class UserService {
     await admin.save();
 
     return admin;
+  }
+
+  async getAllUsersExcept(excludeUserId) {
+    try {
+      return await User.find({ _id: { $ne: excludeUserId } });
+    } catch (error) {
+      throw new Error("Error fetching users: " + error.message);
+    }
   }
 }
 

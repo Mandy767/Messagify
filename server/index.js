@@ -1,10 +1,11 @@
-const app = require("./app");
-
+const { app } = require("./app"); // Import both app and server
 const env = require("./config/env");
 require("./config/database");
 
-app.listen(env.PORT, () => {
-  console.log(`Server running on port ${env.PORT}`);
+const PORT = env.PORT;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
 process.on("uncaughtException", (error) => {

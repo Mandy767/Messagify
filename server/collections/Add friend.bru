@@ -1,0 +1,18 @@
+meta {
+  name: Add friend
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:3000/api/user/addFriend
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId":"66e93e1d555e3b6b5df3b9c2",
+    "friendId":"66e92f35c445d0acee8e1f48"
+  }
+}

@@ -6,7 +6,7 @@ meta {
 
 post {
   url: http://localhost:3000/api/user/register
-  body: json
+  body: multipartForm
   auth: none
 }
 
@@ -16,4 +16,11 @@ body:json {
     "username":"zoro",
     "password":"12345"
   }
+}
+
+body:multipart-form {
+  username: bbbbb
+  password: 123
+  name: bbbbbbbbbbb
+  profilepic: @file(C:\Users\manda\Downloads\taan-huyn-O5IC6sMevwE-unsplash.jpg)
 }

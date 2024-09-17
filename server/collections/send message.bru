@@ -1,0 +1,19 @@
+meta {
+  name: send message
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:3000/api/message/sendMessage
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    
+     "recipientId":"66e92f35c445d0acee8e1f48",
+     "content":"Hello"
+  }
+}
