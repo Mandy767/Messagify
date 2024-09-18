@@ -8,6 +8,7 @@ import { useAuth } from '@/store/AuthContext';
 import { useNavbar } from '@/store/NavbarContext';
 import { Loader } from 'lucide-react';
 import LogoutModal from '@/components/LogoutModal';
+import PixelArtLoader from './Loader';
 
 function Navbar() {
     const navigate = useNavigate();
@@ -21,8 +22,8 @@ function Navbar() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <Loader className="animate-spin text-blue-500" size={24} />
-                <span className="ml-2 text-gray-700">Loading...</span>
+                <PixelArtLoader />
+
             </div>
         );
     }

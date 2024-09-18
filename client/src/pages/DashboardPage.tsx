@@ -6,6 +6,7 @@ import { useNavbar } from "@/store/NavbarContext";
 import { Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import dispatchMessage from "@/hooks/messageHandler";
+import PixelArtLoader from "@/components/Loader";
 
 interface User {
     _id: string;
@@ -105,17 +106,19 @@ function DashboardPage() {
     const displayedPeople = activeTab === 'all' ? people : friends;
 
     return (
-        <div className="flex flex-col h-screen p-6 bg-gray-50">
-            <div className="mb-6">
-                <div className="flex space-x-4">
+        <div className="flex flex-col h-screen items-center bg-gray-50 pt-10">
+            <div className="mb-6 flex justify-center">
+                <div className="flex space-x-4 ">
                     <button
-                        className={`py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        className={`py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
                         onClick={() => setActiveTab('all')}
                     >
                         All Users
                     </button>
                     <button
-                        className={`py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${activeTab === 'friends' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        className={`py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${activeTab === 'friends' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
                         onClick={() => setActiveTab('friends')}
                     >
                         Friends
@@ -123,14 +126,22 @@ function DashboardPage() {
                 </div>
             </div>
 
-            <div className="flex-grow">
+            <div className="flex-grow flex flex-col items-center overflow-y-auto">
                 <h2 className="text-3xl font-bold mb-6 text-blue-700">
                     {activeTab === 'all' ? 'All Users' : 'Friends'}
                 </h2>
 
                 {loading ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Loader className="animate-spin text-blue-600" size={48} />
+                    <div className="flex justify-center h-full ">
+                        <div className="flex flex-col justify-center items-center ">
+                            <div className="justify-center">
+                                <PixelArtLoader />
+                            </div>
+
+                            <div className="flex mt-10 ml-7 text-center">
+                                <span>Yamete kudasai !!</span>
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -139,11 +150,10 @@ function DashboardPage() {
                                 key={person._id}
                                 name={person.name}
                                 profilePicture={`${import.meta.env.VITE_SERVER_ENDPOINT}/${person.profilepic}`}
-                                //@ts-ignore
                                 className="transition-transform transform hover:scale-105 hover:shadow-lg"
                                 actionButton={
                                     person.isFriend ? (
-                                        <div className="flex-row space-x-4">
+                                        <div className="flex flex-col space-y-3">
                                             <button
                                                 onClick={() => navigate(`/chat/${user._id}/${person._id}`)}
                                                 className="py-2 px-4 bg-blue-600 text-white rounded-lg"

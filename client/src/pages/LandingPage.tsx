@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 
 import { useAuth } from '@/store/AuthContext';
-import { Loader } from 'lucide-react';
 import { useNavbar } from '@/store/NavbarContext';
 import { useEffect } from 'react';
+import PixelArtLoader from '@/components/Loader';
 
 function LandingPage() {
     const navigate = useNavigate();
@@ -18,8 +18,7 @@ function LandingPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <Loader className="animate-spin text-blue-500" size={24} />
-                <span className="ml-2 text-gray-700">Loading...</span>
+                <PixelArtLoader />
             </div>
         );
     }
