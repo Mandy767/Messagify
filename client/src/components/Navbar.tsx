@@ -43,11 +43,11 @@ function Navbar() {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] text-gray-600 shadow-md z-50">
+            <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-600 to-blue-800 text-gray-600 shadow-md z-50">
                 <div className="container mx-auto flex items-center justify-between p-4">
                     <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
                         <img src="/speech-bubble.png" alt="Logo" className="h-8 w-8 mr-2" />
-                        <h1 className="text-2xl font-bold text-gray-900 select-none">
+                        <h1 className="text-2xl font-bold text-white select-none">
                             Messagify
                         </h1>
                     </div>
@@ -76,13 +76,13 @@ function Navbar() {
                     <div className="hidden md:flex items-center space-x-6">
                         {islanding && (
                             <>
-                                <Link to="home" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
+                                <Link to="home" smooth={true} duration={500} className="hover:text-black text-white cursor-pointer">
                                     Home
                                 </Link>
-                                <Link to="features" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
+                                <Link to="features" smooth={true} duration={500} className="hover:text-black text-white cursor-pointer">
                                     Features
                                 </Link>
-                                <Link to="contact" smooth={true} duration={500} className="hover:text-black text-gray-800 cursor-pointer">
+                                <Link to="contact" smooth={true} duration={500} className="hover:text-black text-white cursor-pointer">
                                     Contact
                                 </Link>
                             </>
@@ -98,7 +98,7 @@ function Navbar() {
                                 <div className="ml-4 relative">
                                     <button
                                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                        className="flex items-center text-gray-900 font-semibold">
+                                        className="flex items-center text-black font-semibold">
                                         <span>{user?.name}</span>
                                         <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
@@ -109,7 +109,7 @@ function Navbar() {
                                         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
                                             <button
                                                 onClick={handleLogout}
-                                                className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                                                className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100">
                                                 Logout
                                             </button>
                                         </div>

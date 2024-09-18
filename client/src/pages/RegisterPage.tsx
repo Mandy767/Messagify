@@ -57,8 +57,8 @@ function RegisterPage() {
     return (
         <>
 
-            <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] px-4 sm:px-6 lg:px-8">
-                <div className="max-w-md w-full bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] p-8 rounded-lg shadow-lg border-gray-400 border-2">
+            <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 via-blue-300 to-blue-500 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg border-gray-400 border-2">
                     <h2 className="text-center text-2xl font-bold text-gray-900">Create your account</h2>
                     <form
                         onSubmit={registerHandler}
