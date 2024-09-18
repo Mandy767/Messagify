@@ -30,7 +30,6 @@ function DashboardPage() {
         setIslanding(false);
     }, []);
 
-    // Fetch all users
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
@@ -44,7 +43,6 @@ function DashboardPage() {
         }
     }, []);
 
-    // Fetch friends
     const fetchFriends = useCallback(async () => {
         setLoading(true);
         try {
@@ -67,7 +65,6 @@ function DashboardPage() {
         }
     }, []);
 
-    // Handle adding a friend
     const handleAddFriend = async (id: string) => {
         try {
             await sendRequest(`/api/user/addFriend`, {
@@ -75,14 +72,14 @@ function DashboardPage() {
                 body: JSON.stringify({ "userId": user._id, "friendId": id })
             });
             dispatchMessage('success', 'Added Friend Successfully');
-            fetchUsers(); // Refresh users list
+            fetchUsers();
         } catch (err) {
             dispatchMessage('error', 'Failed to add friend.');
             console.error(err);
         }
     };
 
-    // Handle removing a friend
+
     const handleRemoveFriend = async (id: string) => {
         try {
             await sendRequest(`/api/user/removeFriend`, {
@@ -90,14 +87,13 @@ function DashboardPage() {
                 body: JSON.stringify({ "userId": user._id, "friendId": id })
             });
             dispatchMessage('success', 'Friend removed successfully');
-            fetchFriends(); // Refresh friends list
+            fetchFriends();
         } catch (err) {
             dispatchMessage('error', 'Failed to remove friend.');
             console.error(err);
         }
     };
 
-    // Effect to fetch data when tab changes
     useEffect(() => {
         if (activeTab === 'all') {
             fetchUsers();
@@ -110,7 +106,6 @@ function DashboardPage() {
 
     return (
         <div className="flex flex-col h-screen p-6 bg-gray-50">
-            {/* Tab Buttons */}
             <div className="mb-6">
                 <div className="flex space-x-4">
                     <button
@@ -128,7 +123,6 @@ function DashboardPage() {
                 </div>
             </div>
 
-            {/* User/Friend List */}
             <div className="flex-grow">
                 <h2 className="text-3xl font-bold mb-6 text-blue-700">
                     {activeTab === 'all' ? 'All Users' : 'Friends'}
@@ -145,6 +139,7 @@ function DashboardPage() {
                                 key={person._id}
                                 name={person.name}
                                 profilePicture={`${import.meta.env.VITE_SERVER_ENDPOINT}/${person.profilepic}`}
+                                //@ts-ignore
                                 className="transition-transform transform hover:scale-105 hover:shadow-lg"
                                 actionButton={
                                     person.isFriend ? (

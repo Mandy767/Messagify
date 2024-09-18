@@ -4,9 +4,8 @@ const messageServices = new MessageServices();
 exports.sendMessage = async (req, res, next) => {
   try {
     const { recipientId, content } = req.body;
-    const senderId = req.session.user._id; // The authenticated user
+    const senderId = req.session.user._id;
 
-    console.log(content);
     const message = await messageServices.createMessage(
       senderId,
       recipientId,
@@ -21,8 +20,6 @@ exports.sendMessage = async (req, res, next) => {
 exports.getMessages = async (req, res, next) => {
   try {
     const { userId1, userId2 } = req.params;
-    console.log("User ID 1: ", userId1);
-    console.log("User ID 2: ", userId2);
     const messages = await messageServices.getMessagesBetweenUsers(
       userId1,
       userId2

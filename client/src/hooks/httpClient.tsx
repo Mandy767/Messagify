@@ -1,4 +1,5 @@
 const useHttpRequest = () => {
+    //@ts-ignore
     const sendRequest = async (URI, config = {}) => {
         try {
             const endpoint = import.meta.env.VITE_SERVER_ENDPOINT + URI;
@@ -6,6 +7,7 @@ const useHttpRequest = () => {
             const response = await fetch(endpoint, {
                 headers: {
                     "Content-Type": "application/json",
+                    //@ts-ignore
                     ...config?.headers,
                     accept: "application/json",
                 },

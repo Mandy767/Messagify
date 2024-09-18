@@ -1,7 +1,7 @@
-// components/LogoutModal.tsx
+
 import React from 'react';
 import { Dialog } from '@headlessui/react';
-import { Button } from '../components/ui/button'; // Ensure this is your custom button component
+import { Button } from '../components/ui/button';
 
 interface LogoutModalProps {
     isOpen: boolean;

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useHttpRequest } from "../hooks/httpClient";
-import dispatchMessage from "../hooks/messageHandler"; // Adjust the import based on your project structure
+import dispatchMessage from "../hooks/messageHandler";
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -18,8 +18,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: any) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [user, setUser] = useState<any>(null); // Define the type if available
-    const [type, setType] = useState("user"); // Define the type if applicable
+    const [user, setUser] = useState<any>(null);
+    const [type, setType] = useState("user");
     const sendRequest = useHttpRequest();
 
 
@@ -31,12 +31,11 @@ export const AuthProvider = ({ children }: any) => {
                 method: "POST",
             });
 
-            // Clear local storage and update state
             localStorage.clear();
             setIsAuthenticated(false);
             setUser(null);
             dispatchMessage("success", "Logout successful");
-            setType("user"); // Adjust as necessary
+            setType("user");
         } catch (err) {
             console.error("Logout failed", err);
             dispatchMessage("error", "Logout failed");

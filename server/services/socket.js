@@ -15,7 +15,6 @@ module.exports = (server) => {
   io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
     const sender = socket.handshake.headers.authorization;
-    const username = socket.handshake.headers.extra;
 
     userSocketMap.set(sender, socket.id);
 
@@ -37,18 +36,6 @@ module.exports = (server) => {
         });
       } catch (err) {
         console.error("Error sending message:", err);
-      }
-    });
-
-    socket.on("get_messages", async (data, callback) => {
-      const { userId1, userId2 } = data;
-      try {
-        const messages = await messageServices.getMessagesBetweenUsers(
-          userId1,
-          userId2
-        );
-      } catch (err) {
-        console.error("Error retrieving messages:", err);
       }
     });
 

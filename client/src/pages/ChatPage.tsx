@@ -66,13 +66,12 @@ function ChatPage() {
 
     useEffect(() => {
         fetchFriend();
-        console.log("here")
+
         requestPastMessages();
 
         if (socket) {
             console.log('socket connected')
             socket.on('receive_message', (data) => {
-                console.log(data)
                 setChat((prevChat) => [...prevChat, data]);
             });
 
@@ -90,11 +89,11 @@ function ChatPage() {
                 sender: user._id,
                 recipient: friendId,
                 content: message,
+                createdAt: new Date().toLocaleString()
             };
 
 
             if (socket) {
-                console.log(newMessage);
                 socket.emit('send_message', newMessage);
                 setChat((prevChat) => [...prevChat, newMessage]);
                 setMessage('');

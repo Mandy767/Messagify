@@ -1,5 +1,6 @@
 import { toast } from 'react-toastify'
 
+//@ts-ignore
 const dispatchMessage = (type, message) => {
     if (type instanceof Error) {
         type = 'error'

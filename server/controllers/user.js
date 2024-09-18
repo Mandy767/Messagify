@@ -6,7 +6,6 @@ const userServices = new UserServices();
 exports.registerUser = async (req, res, next) => {
   try {
     const userData = req.body;
-    console.log(userData);
     const newUser = await userServices.createUser({
       ...userData,
       profilepic: req?.file?.path,
@@ -74,7 +73,6 @@ exports.updateAdminPassword = async (req, res, next) => {
 
 exports.addFriend = async (req, res) => {
   const { userId, friendId } = req.body;
-  console.log(req.body);
   try {
     await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendId } });
     await User.findByIdAndUpdate(friendId, { $addToSet: { friends: userId } });
@@ -129,7 +127,6 @@ exports.getFriends = async (req, res) => {
 
 exports.getAllUsersExceptSelf = async (req, res, next) => {
   try {
-    // Assuming the user ID is stored in the session
     const { _id } = req.session.user;
     const users = await userServices.getAllUsersExcept(_id);
 

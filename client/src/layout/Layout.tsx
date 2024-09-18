@@ -3,11 +3,11 @@ import React from 'react';
 import Navbar from "../components/Navbar";
 import Footer from '@/components/Footer';
 
-const Layout: React.FC<{ children: React.ReactNode; islanding?: boolean }> = ({ children, islanding }) => {
+const Layout: React.FC<{ children: React.ReactNode; islanding?: boolean }> = ({ children }) => {
     return (
         <div>
-            <Navbar islanding={islanding || false} />
-            <main className="pt-16"> {/* Adjust padding-top based on Navbar height */}
+            <Navbar />
+            <main className="pt-16">
                 {children}
             </main>
             <Footer />

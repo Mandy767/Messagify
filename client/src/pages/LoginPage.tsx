@@ -41,13 +41,14 @@ function LoginPage() {
             });
 
             data = data.data;
-
+            //@ts-ignore
             if (!data.message) {
                 dispatchMessage("success", "Login successful");
-                login(); // Set the user as authenticated
-                navigate("/dashboard"); // Redirect to dashboard
+                login();
+                navigate("/dashboard");
                 window.location.reload()
             } else {
+                //@ts-ignore
                 dispatchMessage("error", data.message);
             }
         } catch (err) {

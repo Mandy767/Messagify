@@ -6,7 +6,7 @@ import { Loader } from 'lucide-react';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, isLoading } = useAuth();
-    const location = useLocation(); // Get the current path
+    const location = useLocation();
 
     if (isLoading) {
         return (

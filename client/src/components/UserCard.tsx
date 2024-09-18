@@ -3,7 +3,7 @@ import React from "react";
 interface UserCardProps {
     name: string;
     profilePicture: string;
-    actionButton: React.ReactNode; // Add a prop for the action button
+    actionButton: React.ReactNode;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ name, profilePicture, actionButton }) => {
