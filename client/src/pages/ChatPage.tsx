@@ -1,45 +1,27 @@
 import { useHttpRequest } from '@/hooks/httpClient';
+import { useSocket } from '@/hooks/Socket';
 import { useAuth } from '@/store/AuthContext';
+import { useIsOnline } from '@/store/IsOnlineContext';
 import { useNavbar } from '@/store/NavbarContext';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import io from 'socket.io-client';
+
 
 function ChatPage() {
-    const [socket, setSocket] = useState(null);
+
     const { userId2: friendId } = useParams();
     const [friendData, setFriendData] = useState(null);
-    const [pastMessages, setPastMessages] = useState();
-
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
     const { user } = useAuth();
     const username = user.username;
     const sendRequest = useHttpRequest();
     const { setIslanding } = useNavbar();
-
-    const handleSocket = useCallback(() => {
-        const socketInstance = io('http://localhost:3000', {
-            extraHeaders: {
-                Authorization: user._id,
-
-            }
-        });
-
-        setSocket(socketInstance);
-
-        return () => {
-            socketInstance.disconnect();
-        };
-    }, []);
+    const socket = useSocket();
+    const { isonline } = useIsOnline()
 
     useEffect(() => {
-        const cleanupSocket = handleSocket();
         setIslanding(false);
-
-        return () => {
-            if (cleanupSocket) cleanupSocket();
-        };
     }, []);
 
     const fetchFriend = useCallback(async () => {
@@ -71,12 +53,15 @@ function ChatPage() {
 
         if (socket) {
             console.log('socket connected')
+
             socket.on('receive_message', (data) => {
                 setChat((prevChat) => [...prevChat, data]);
             });
 
+
             return () => {
                 socket.off('receive_message');
+
             };
         } else {
             console.log('socket not connected')
@@ -95,6 +80,7 @@ function ChatPage() {
 
             if (socket) {
                 socket.emit('send_message', newMessage);
+                //@ts-ignore
                 setChat((prevChat) => [...prevChat, newMessage]);
                 setMessage('');
             }
@@ -113,7 +99,6 @@ function ChatPage() {
                 />
                 <div>
                     <div className="font-bold text-lg">{friendData?.username}</div>
-                    <div className="text-sm text-gray-200">Online</div>
                 </div>
             </div>
 

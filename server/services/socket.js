@@ -4,6 +4,7 @@ const MessageServices = require("./message");
 const messageServices = new MessageServices();
 
 const userSocketMap = new Map();
+const onlineUsers = new Set();
 
 module.exports = (server) => {
   const io = new Server(server, {
@@ -17,6 +18,8 @@ module.exports = (server) => {
     const sender = socket.handshake.headers.authorization;
 
     userSocketMap.set(sender, socket.id);
+
+    const isOnline = userSocketMap.has(sender);
 
     socket.on("send_message", async (data) => {
       const { recipient, content } = data;

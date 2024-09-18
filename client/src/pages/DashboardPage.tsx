@@ -3,10 +3,12 @@ import UserCard from "@/components/UserCard";
 import { useHttpRequest } from "@/hooks/httpClient";
 import { useAuth } from "@/store/AuthContext";
 import { useNavbar } from "@/store/NavbarContext";
-import { Loader } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import dispatchMessage from "@/hooks/messageHandler";
 import PixelArtLoader from "@/components/Loader";
+
+
 
 interface User {
     _id: string;
@@ -26,6 +28,15 @@ function DashboardPage() {
     const sendRequest = useHttpRequest();
     const { user } = useAuth();
     const { setIslanding } = useNavbar();
+
+
+    const handleClickMessages = (id) => {
+
+        const recipient = id;
+        navigate(`/chat/${user._id}/${recipient}`)
+
+    };
+
 
     useEffect(() => {
         setIslanding(false);
@@ -155,7 +166,7 @@ function DashboardPage() {
                                     person.isFriend ? (
                                         <div className="flex flex-col space-y-3">
                                             <button
-                                                onClick={() => navigate(`/chat/${user._id}/${person._id}`)}
+                                                onClick={() => handleClickMessages(person._id)}
                                                 className="py-2 px-4 bg-blue-600 text-white rounded-lg"
                                             >
                                                 Message
