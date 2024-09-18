@@ -1,14 +1,13 @@
-import { useEffect, useState, useCallback } from "react";
-import UserCard from "@/components/UserCard";
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserCircle, MessageCircle, UserPlus, UserMinus } from "lucide-react";
 import { useHttpRequest } from "@/hooks/httpClient";
 import { useAuth } from "@/store/AuthContext";
 import { useNavbar } from "@/store/NavbarContext";
-
-import { useNavigate } from "react-router-dom";
 import dispatchMessage from "@/hooks/messageHandler";
-import PixelArtLoader from "@/components/Loader";
-
-
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface User {
     _id: string;
@@ -18,6 +17,61 @@ interface User {
 }
 
 type Tab = 'all' | 'friends';
+
+const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => (
+    <Card className="w-full max-w-sm mx-auto">
+        <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+                <div className="relative w-16 h-16">
+                    <img
+                        src={`${import.meta.env.VITE_SERVER_ENDPOINT}/${user.profilepic}`}
+                        alt={user.name}
+                        className="w-full h-full object-cover rounded-full"
+                    />
+                    {user.isFriend && (
+                        <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1">
+                            <UserCircle size={16} className="text-white" />
+                        </div>
+                    )}
+                </div>
+                <div className="flex-1">
+                    <h3 className="text-lg font-semibold">{user.name}</h3>
+                    <div className="mt-2 space-y-2">
+                        {user.isFriend ? (
+                            <>
+                                <Button
+                                    onClick={() => onMessage(user._id)}
+                                    className="w-full flex items-center justify-center"
+                                    variant="outline"
+                                >
+                                    <MessageCircle className="mr-2" size={18} />
+                                    Message
+                                </Button>
+                                <Button
+                                    onClick={() => onRemoveFriend(user._id)}
+                                    className="w-full flex items-center justify-center"
+                                    variant="destructive"
+                                >
+                                    <UserMinus className="mr-2" size={18} />
+                                    Remove Friend
+                                </Button>
+                            </>
+                        ) : (
+                            <Button
+                                onClick={() => onAddFriend(user._id)}
+                                className="w-full flex items-center justify-center"
+                                variant="default"
+                            >
+                                <UserPlus className="mr-2" size={18} />
+                                Add Friend
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+);
 
 function DashboardPage() {
     const navigate = useNavigate();
@@ -29,14 +83,9 @@ function DashboardPage() {
     const { user } = useAuth();
     const { setIslanding } = useNavbar();
 
-
-    const handleClickMessages = (id) => {
-
-        const recipient = id;
-        navigate(`/chat/${user._id}/${recipient}`)
-
+    const handleClickMessages = (id: string) => {
+        navigate(`/chat/${user._id}/${id}`);
     };
-
 
     useEffect(() => {
         setIslanding(false);
@@ -62,12 +111,10 @@ function DashboardPage() {
                 method: "POST",
                 body: JSON.stringify({ "userId": user._id })
             });
-
-            const updatedFriends = await data.data.map((friend: User) => ({
+            const updatedFriends = data.data.map((friend: User) => ({
                 ...friend,
                 isFriend: true
             }));
-
             setFriends(updatedFriends);
         } catch (err) {
             dispatchMessage('error', 'Failed to fetch friends.');
@@ -91,7 +138,6 @@ function DashboardPage() {
         }
     };
 
-
     const handleRemoveFriend = async (id: string) => {
         try {
             await sendRequest(`/api/user/removeFriend`, {
@@ -112,86 +158,42 @@ function DashboardPage() {
         } else if (activeTab === 'friends') {
             fetchFriends();
         }
-    }, [activeTab]);
+    }, [activeTab, fetchUsers, fetchFriends]);
 
     const displayedPeople = activeTab === 'all' ? people : friends;
 
     return (
-        <div className="flex flex-col h-screen items-center bg-gray-50 pt-10">
-            <div className="mb-6 flex justify-center">
-                <div className="flex space-x-4 ">
-                    <button
-                        className={`py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                        onClick={() => setActiveTab('all')}
-                    >
-                        All Users
-                    </button>
-                    <button
-                        className={`py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${activeTab === 'friends' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                        onClick={() => setActiveTab('friends')}
-                    >
-                        Friends
-                    </button>
+        <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as Tab)}>
+                <TabsList className="grid w-full grid-cols-2 mb-8">
+                    <TabsTrigger value="all">All Users</TabsTrigger>
+                    <TabsTrigger value="friends">Friends</TabsTrigger>
+                </TabsList>
+                <TabsContent value="all">
+                    <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">All Users</h2>
+                </TabsContent>
+                <TabsContent value="friends">
+                    <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Friends</h2>
+                </TabsContent>
+            </Tabs>
+
+            {loading ? (
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
                 </div>
-            </div>
-
-            <div className="flex-grow flex flex-col items-center overflow-y-auto">
-                <h2 className="text-3xl font-bold mb-6 text-blue-700">
-                    {activeTab === 'all' ? 'All Users' : 'Friends'}
-                </h2>
-
-                {loading ? (
-                    <div className="flex justify-center h-full ">
-                        <div className="flex flex-col justify-center items-center ">
-                            <div className="justify-center">
-                                <PixelArtLoader />
-                            </div>
-
-                            <div className="flex mt-10 ml-7 text-center">
-                                <span>Yamete kudasai !!</span>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {displayedPeople.map((person) => (
-                            <UserCard
-                                key={person._id}
-                                name={person.name}
-                                profilePicture={`${import.meta.env.VITE_SERVER_ENDPOINT}/${person.profilepic}`}
-                                className="transition-transform transform hover:scale-105 hover:shadow-lg"
-                                actionButton={
-                                    person.isFriend ? (
-                                        <div className="flex flex-col space-y-3">
-                                            <button
-                                                onClick={() => handleClickMessages(person._id)}
-                                                className="py-2 px-4 bg-blue-600 text-white rounded-lg"
-                                            >
-                                                Message
-                                            </button>
-                                            <button
-                                                onClick={() => handleRemoveFriend(person._id)}
-                                                className="py-2 px-4 bg-red-600 text-white rounded-lg"
-                                            >
-                                                Remove Friend
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleAddFriend(person._id)}
-                                            className="py-2 px-4 bg-green-600 text-white rounded-lg"
-                                        >
-                                            Add Friend
-                                        </button>
-                                    )
-                                }
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {displayedPeople.map((person) => (
+                        <UserCard
+                            key={person._id}
+                            user={person}
+                            onAddFriend={handleAddFriend}
+                            onRemoveFriend={handleRemoveFriend}
+                            onMessage={handleClickMessages}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
