@@ -1,11 +1,10 @@
 import { useHttpRequest } from '@/hooks/httpClient';
 import { useSocket } from '@/hooks/Socket';
 import { useAuth } from '@/store/AuthContext';
-import { useIsOnline } from '@/store/IsOnlineContext';
 import { useNavbar } from '@/store/NavbarContext';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-
+import { Send } from 'lucide-react';
 
 function ChatPage() {
 
@@ -14,11 +13,10 @@ function ChatPage() {
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
     const { user } = useAuth();
-    const username = user.username;
     const sendRequest = useHttpRequest();
     const { setIslanding } = useNavbar();
     const socket = useSocket();
-    const { isonline } = useIsOnline()
+    const chatContainerRef = useRef(null);
 
     useEffect(() => {
         setIslanding(false);
@@ -68,6 +66,16 @@ function ChatPage() {
         }
     }, [socket]);
 
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [chat]);
+
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
     const handleSendMessage = () => {
         if (message.trim()) {
             const newMessage = {
@@ -88,56 +96,94 @@ function ChatPage() {
     };
 
 
+    const groupMessagesByDate = (messages) => {
+        const groups = {};
+        messages.forEach((msg) => {
+            const date = new Date(msg.createdAt).toLocaleDateString();
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+            groups[date].push(msg);
+        });
+        return groups;
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        } else {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+    };
+
+    const groupedMessages = groupMessagesByDate(chat);
+
     return (
-        <div className="chat-page h-screen flex flex-col ">
-            {/* Navbar component for receiver info */}
-            <div className="navbar bg-blue-600 text-white pl-5 p-4 pt-8 flex items-center ">
+        <div className="flex flex-col h-screen bg-gray-100 pt-3">
+            <div className="bg-white border-b border-gray-300 p-4 flex items-center">
                 <img
                     src={`${import.meta.env.VITE_SERVER_ENDPOINT}/${friendData?.profilepic}`}
                     alt={friendData?.username}
-                    className="rounded-full w-12 h-12 mr-4"
+                    className="w-8 h-8 rounded-full mr-3"
                 />
-                <div>
-                    <div className="font-bold text-lg">{friendData?.username}</div>
-                </div>
+                <span className="font-semibold">{friendData?.username}</span>
             </div>
 
-            <div className="chat-container p-4 flex-grow overflow-y-scroll flex flex-col">
-                <div className="chat-window border border-gray-300 rounded-lg p-4 mb-4 h-full overflow-y-scroll">
-                    {chat.map((msg, index) => (
-                        <div key={index} className={`flex ${msg.sender !== user._id ? 'justify-start' : 'justify-end'} mb-2`}>
-                            <div className='flex flex-col space-y-1 max-w-xs'>
-                                {/* Message bubble */}
-                                <div className={`p-2 rounded-lg ${msg.sender === user._id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                                    {msg.content}
-                                </div>
-                                {/* Timestamp */}
-                                <div className={`text-xs text-gray-500 ${msg.sender === user._id ? 'text-right' : 'text-left'}`}>
-                                    {new Date(msg.createdAt).toLocaleTimeString('en-US', {
-                                        hour: 'numeric',
-                                        minute: 'numeric',
-                                        hour12: true
-                                    })}
+            <div ref={chatContainerRef} className="flex-grow overflow-y-auto p-4">
+                {Object.entries(groupedMessages).reverse().map(([date, messages]) => (
+                    <div key={date}>
+                        <div className="flex justify-center my-4">
+                            <span className="bg-gray-200 text-gray-600 text-sm font-medium px-3 py-1 rounded-full">
+                                {formatDate(date)}
+                            </span>
+                        </div>
+                        {messages.map((msg, index) => (
+                            <div
+                                key={index}
+                                className={`flex ${msg.sender !== user._id ? 'justify-start' : 'justify-end'} mb-4`}
+                            >
+                                <div
+                                    className={`max-w-[70%] rounded-2xl px-4 py-2 break-words ${msg.sender === user._id
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-gray-300 text-black'
+                                        }`}
+                                >
+                                    <p>{msg.content}</p>
+                                    <span className="text-xs opacity-70 mt-1 block">
+                                        {new Date(msg.createdAt).toLocaleTimeString('en-US', {
+                                            hour: 'numeric',
+                                            minute: 'numeric',
+                                            hour12: true,
+                                        })}
+                                    </span>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                ))}
+            </div>
 
-
-                </div>
-                <div className="chat-input flex">
+            <div className="bg-white border-t border-gray-300 p-4">
+                <div className="flex items-center bg-gray-100 rounded-full">
                     <input
                         type="text"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Type a message..."
+                        className="flex-grow bg-transparent px-4 py-2 focus:outline-none"
+                        placeholder="Message..."
                     />
                     <button
                         onClick={handleSendMessage}
-                        className="p-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600"
+                        className="p-2 text-blue-500 hover:text-blue-700 focus:outline-none"
                     >
-                        Send
+                        <Send size={24} />
                     </button>
                 </div>
             </div>
