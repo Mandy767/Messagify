@@ -9,7 +9,7 @@ import { Send } from 'lucide-react';
 function ChatPage() {
 
     const { userId2: friendId } = useParams();
-    const [friendData, setFriendData] = useState(null);
+    const [friendData, setFriendData] = useState();
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
     const { user } = useAuth();
@@ -52,12 +52,15 @@ function ChatPage() {
         if (socket) {
             console.log('socket connected')
 
+            //@ts-ignore
             socket.on('receive_message', (data) => {
+                //@ts-ignore
                 setChat((prevChat) => [...prevChat, data]);
             });
 
 
             return () => {
+                //@ts-ignore
                 socket.off('receive_message');
 
             };
@@ -73,6 +76,7 @@ function ChatPage() {
 
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
+            //@ts-ignore
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     };
@@ -87,6 +91,7 @@ function ChatPage() {
 
 
             if (socket) {
+                //@ts-ignore
                 socket.emit('send_message', newMessage);
                 //@ts-ignore
                 setChat((prevChat) => [...prevChat, newMessage]);
@@ -95,19 +100,24 @@ function ChatPage() {
         }
     };
 
-
-    const groupMessagesByDate = (messages) => {
+    //@ts-ignore
+    const groupMessagesByDate = (messages: any) => {
         const groups = {};
+        //@ts-ignore
         messages.forEach((msg) => {
             const date = new Date(msg.createdAt).toLocaleDateString();
+            //@ts-ignore
             if (!groups[date]) {
+                //@ts-ignore
                 groups[date] = [];
             }
+            //@ts-ignore
             groups[date].push(msg);
         });
         return groups;
     };
 
+    //@ts-ignore
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const today = new Date();
@@ -129,11 +139,14 @@ function ChatPage() {
         <div className="flex flex-col h-screen bg-gray-100 pt-3">
             <div className="bg-white border-b border-gray-300 p-4 flex items-center">
                 <img
+                    //@ts-ignore
                     src={`${import.meta.env.VITE_SERVER_ENDPOINT}/${friendData?.profilepic}`}
+                    //@ts-ignore
                     alt={friendData?.username}
                     className="w-8 h-8 rounded-full mr-3"
                 />
-                <span className="font-semibold">{friendData?.username}</span>
+
+                <span className="font-semibold">{(friendData as any)?.username}</span>
             </div>
 
             <div ref={chatContainerRef} className="flex-grow overflow-y-auto p-4">
@@ -144,7 +157,8 @@ function ChatPage() {
                                 {formatDate(date)}
                             </span>
                         </div>
-                        {messages.map((msg, index) => (
+
+                        {(messages as any[]).map((msg: any, index: any) => (
                             <div
                                 key={index}
                                 className={`flex ${msg.sender !== user._id ? 'justify-start' : 'justify-end'} mb-4`}

@@ -6,7 +6,6 @@ import { FaBars, FaTimes } from 'react-icons/fa';
 import { Button } from './ui/button';
 import { useAuth } from '@/store/AuthContext';
 import { useNavbar } from '@/store/NavbarContext';
-import { Loader } from 'lucide-react';
 import LogoutModal from '@/components/LogoutModal';
 import PixelArtLoader from './Loader';
 
@@ -55,7 +54,7 @@ function Navbar() {
                     <div className="md:hidden flex items-center justify-center">
                         <div onClick={toggleMenu}>
                             {isOpen ? (
-                                <FaTimes size={24} />
+                                <FaTimes className='text-white' size={24} />
                             ) : isAuthenticated ? (
                                 <div className="flex items-center">
                                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-900">
@@ -67,7 +66,7 @@ function Navbar() {
                                     </div>
                                 </div>
                             ) : (
-                                <FaBars size={24} />
+                                <FaBars className='text-white' size={24} />
                             )}
 
                         </div>
@@ -133,7 +132,7 @@ function Navbar() {
 
                 {/* Mobile Menu */}
                 {isOpen && (
-                    <ul className="md:hidden flex flex-col items-center bg-gradient-to-r from-[#f5f7fa] to-[#c3cfe2] text-gray-800 py-4 shadow-lg rounded-lg">
+                    <ul className="md:hidden flex flex-col items-center bg-gradient-to-r from-blue-600 to-blue-800 text-gray-800 py-4 shadow-lg rounded-lg">
                         <div className="w-full border-b-2 border-gray-300 mb-2"></div>
                         {islanding && (
                             <>
@@ -143,7 +142,7 @@ function Navbar() {
                                         to="home"
                                         smooth={true}
                                         duration={500}
-                                        className="hover:text-blue-600 text-gray-800 cursor-pointer block w-full transition-colors duration-300"
+                                        className=" text-white  cursor-pointer block w-full transition-colors duration-300"
                                     >
                                         Home
                                     </Link>
@@ -154,7 +153,7 @@ function Navbar() {
                                         to="features"
                                         smooth={true}
                                         duration={500}
-                                        className="hover:text-blue-600 text-gray-800 cursor-pointer block w-full transition-colors duration-300"
+                                        className="text-white cursor-pointer block w-full transition-colors duration-300"
                                     >
                                         Features
                                     </Link>
@@ -165,7 +164,7 @@ function Navbar() {
                                         to="contact"
                                         smooth={true}
                                         duration={500}
-                                        className="hover:text-blue-600 text-gray-800 cursor-pointer block w-full transition-colors duration-300"
+                                        className="text-white cursor-pointer block w-full transition-colors duration-300"
                                     >
                                         Contact
                                     </Link>

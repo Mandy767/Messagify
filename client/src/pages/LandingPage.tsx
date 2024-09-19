@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/store/AuthContext';
@@ -23,7 +23,7 @@ function LandingPage() {
         );
     }
 
-    const scrollTo = (id) => {
+    const scrollTo = (id: any) => {
         const element = document.getElementById(id);
         if (element) element.scrollIntoView({ behavior: 'smooth' });
     };
@@ -41,7 +41,7 @@ function LandingPage() {
                         </p>
                         <Button
                             onClick={() => navigate(isAuthenticated ? '/dashboard' : '/register')}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-8 rounded-full transition duration-300 transform hover:scale-105 animate-pulse"
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-8 rounded-full transition duration-300 transform hover:scale-105"
                         >
                             {isAuthenticated ? 'Continue to Dashboard' : 'Start Messaging Now'}
                         </Button>

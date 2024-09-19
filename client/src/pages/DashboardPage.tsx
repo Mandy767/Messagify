@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserCircle, MessageCircle, UserPlus, UserMinus } from "lucide-react";
 import { useHttpRequest } from "@/hooks/httpClient";
@@ -17,7 +17,7 @@ interface User {
 }
 
 type Tab = 'all' | 'friends';
-
+//@ts-ignore
 const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => (
     <Card className="w-full max-w-sm mx-auto">
         <CardContent className="p-6">

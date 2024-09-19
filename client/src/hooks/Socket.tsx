@@ -15,6 +15,7 @@ export const useSocket = () => {
                     },
                 });
 
+                //@ts-ignore
                 setSocketInstance(socket);
 
 
