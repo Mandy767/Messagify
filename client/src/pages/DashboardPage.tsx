@@ -1,13 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserCircle, MessageCircle, UserPlus, UserMinus } from "lucide-react";
 import { useHttpRequest } from "@/hooks/httpClient";
 import { useAuth } from "@/store/AuthContext";
 import { useNavbar } from "@/store/NavbarContext";
 import dispatchMessage from "@/hooks/messageHandler";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import FriendRequestCard from "@/components/FriendRequestCard";
+import UserCard from "@/components/UserCard"
 
 interface User {
     _id: string;
@@ -16,69 +15,22 @@ interface User {
     isFriend?: boolean;
 }
 
-type Tab = 'all' | 'friends';
+interface FriendRequest {
+    _id: string;
+    sender: User;
+}
+
+type Tab = 'all' | 'friends' | 'requests';
 //@ts-ignore
-const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => (
-    <Card className="w-full max-w-sm mx-auto">
-        <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-                <div className="relative w-16 h-16">
-                    <img
-                        src={`${import.meta.env.VITE_SERVER_ENDPOINT}/${user.profilepic}`}
-                        alt={user.name}
-                        className="w-full h-full object-cover rounded-full"
-                    />
-                    {user.isFriend && (
-                        <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1">
-                            <UserCircle size={16} className="text-white" />
-                        </div>
-                    )}
-                </div>
-                <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{user.name}</h3>
-                    <div className="mt-2 space-y-2">
-                        {user.isFriend ? (
-                            <>
-                                <Button
-                                    onClick={() => onMessage(user._id)}
-                                    className="w-full flex items-center justify-center"
-                                    variant="outline"
-                                >
-                                    <MessageCircle className="mr-2" size={18} />
-                                    Message
-                                </Button>
-                                <Button
-                                    onClick={() => onRemoveFriend(user._id)}
-                                    className="w-full flex items-center justify-center"
-                                    variant="destructive"
-                                >
-                                    <UserMinus className="mr-2" size={18} />
-                                    Remove Friend
-                                </Button>
-                            </>
-                        ) : (
-                            <Button
-                                onClick={() => onAddFriend(user._id)}
-                                className="w-full flex items-center justify-center"
-                                variant="default"
-                            >
-                                <UserPlus className="mr-2" size={18} />
-                                Add Friend
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </CardContent>
-    </Card>
-);
+
 
 function DashboardPage() {
     const navigate = useNavigate();
     const [people, setPeople] = useState<User[]>([]);
     const [friends, setFriends] = useState<User[]>([]);
     const [activeTab, setActiveTab] = useState<Tab>('all');
-    const [loading, setLoading] = useState<boolean>(false);
+    const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+
     const sendRequest = useHttpRequest();
     const { user } = useAuth();
     const { setIslanding } = useNavbar();
@@ -92,20 +44,18 @@ function DashboardPage() {
     }, []);
 
     const fetchUsers = useCallback(async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const data = await sendRequest("/api/user/users", { method: "GET" });
             setPeople(data.data);
         } catch (err) {
             dispatchMessage('error', 'Failed to fetch users.');
             console.error(err);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
     const fetchFriends = useCallback(async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const data = await sendRequest(`/api/user/friends`, {
                 method: "POST",
@@ -119,18 +69,16 @@ function DashboardPage() {
         } catch (err) {
             dispatchMessage('error', 'Failed to fetch friends.');
             console.error(err);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
-    const handleAddFriend = async (id: string) => {
+    const handleSendFriendRequest = async (id: string) => {
         try {
-            await sendRequest(`/api/user/addFriend`, {
+            await sendRequest(`/api/user/request/send`, {
                 method: "POST",
                 body: JSON.stringify({ "userId": user._id, "friendId": id })
             });
-            dispatchMessage('success', 'Added Friend Successfully');
+            dispatchMessage('success', 'Friend request sent successfully');
             fetchUsers();
         } catch (err) {
             dispatchMessage('error', 'Failed to add friend.');
@@ -152,22 +100,71 @@ function DashboardPage() {
         }
     };
 
+
+    const fetchFriendRequests = useCallback(async () => {
+        // setLoading(true);
+        try {
+            const data = await sendRequest(`/api/user/request/${user._id}`, {
+                method: "GET"
+            });
+
+            setFriendRequests(data.data);
+        } catch (err) {
+            dispatchMessage('error', 'Failed to fetch friend requests.');
+            console.error(err);
+        }
+    }, []);
+
+
+    const handleAcceptFriendRequest = async (requestId: string) => {
+        try {
+            await sendRequest(`/api/user/request/respond`, {
+                method: "POST",
+                body: JSON.stringify({ "requestId": requestId, "response": "accept" })
+            });
+            dispatchMessage('success', 'Friend request accepted');
+            fetchFriendRequests();
+            fetchFriends();
+        } catch (err) {
+            dispatchMessage('error', 'Failed to accept friend request.');
+            console.error(err);
+        }
+    };
+
+    const handleRejectFriendRequest = async (requestId: string) => {
+        try {
+            await sendRequest(`/api/user/request/respond`, {
+                method: "POST",
+                body: JSON.stringify({ "requestId": requestId, "response": "reject" })
+            });
+            dispatchMessage('success', 'Friend request rejected');
+            fetchFriendRequests();
+        } catch (err) {
+            dispatchMessage('error', 'Failed to reject friend request.');
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
         if (activeTab === 'all') {
             fetchUsers();
         } else if (activeTab === 'friends') {
             fetchFriends();
         }
-    }, [activeTab, fetchUsers, fetchFriends]);
+        else if (activeTab === 'requests') {
+            fetchFriendRequests();
+        }
+    }, [activeTab, fetchUsers, fetchFriends, fetchFriendRequests]);
 
-    const displayedPeople = activeTab === 'all' ? people : friends;
+    // const displayedPeople = activeTab === 'all' ? people : friends;
 
     return (
         <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as Tab)}>
-                <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsList className="grid w-full grid-cols-3 mb-8">
                     <TabsTrigger value="all">All Users</TabsTrigger>
                     <TabsTrigger value="friends">Friends</TabsTrigger>
+                    <TabsTrigger value="requests">Friend Requests</TabsTrigger>
                 </TabsList>
                 <TabsContent value="all">
                     <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">All Users</h2>
@@ -175,25 +172,33 @@ function DashboardPage() {
                 <TabsContent value="friends">
                     <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Friends</h2>
                 </TabsContent>
+                <TabsContent value="requests">
+                    <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Friend Requests</h2>
+                </TabsContent>
             </Tabs>
-
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {displayedPeople.map((person) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {activeTab === 'requests' ? (
+                    friendRequests?.map((request) => (
+                        <FriendRequestCard
+                            key={request._id}
+                            request={request}
+                            onAccept={handleAcceptFriendRequest}
+                            onReject={handleRejectFriendRequest}
+                        />
+                    ))
+                ) : (
+                    (activeTab === 'all' ? people : friends).map((person) => (
                         <UserCard
                             key={person._id}
                             user={person}
-                            onAddFriend={handleAddFriend}
+                            onAddFriend={handleSendFriendRequest}
                             onRemoveFriend={handleRemoveFriend}
                             onMessage={handleClickMessages}
                         />
-                    ))}
-                </div>
-            )}
+                    ))
+                )}
+            </div>
+
         </div>
     );
 }

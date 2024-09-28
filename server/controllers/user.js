@@ -2,6 +2,7 @@ const { ADMIN_USERNAME } = require("../config/env");
 const UserServices = require("../services/user");
 const User = require("../models/user");
 const userServices = new UserServices();
+const friendRequestService = require("../services/friendrequest");
 
 exports.registerUser = async (req, res, next) => {
   try {
@@ -46,7 +47,7 @@ exports.getMe = async (req, res, next) => {
     const user = await userServices.getUserById(_id);
 
     const profile = user.profilepic;
-    console.log(profile);
+
     const type = ADMIN_USERNAME === user.username ? "admin" : "user";
     res.status(200).json({
       user,
@@ -71,14 +72,64 @@ exports.updateAdminPassword = async (req, res, next) => {
   }
 };
 
-exports.addFriend = async (req, res) => {
+// exports.addFriend = async (req, res) => {
+//   const { userId, friendId } = req.body;
+//   try {
+//     await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendId } });
+//     await User.findByIdAndUpdate(friendId, { $addToSet: { friends: userId } });
+//     return res.status(200).json({ message: "Friend added successfully!" });
+//   } catch (error) {
+//     return res.status(500).json({ error: "Server error" });
+//   }
+// };
+
+exports.sendFriendRequest = async (req, res) => {
   const { userId, friendId } = req.body;
   try {
-    await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendId } });
-    await User.findByIdAndUpdate(friendId, { $addToSet: { friends: userId } });
-    return res.status(200).json({ message: "Friend added successfully!" });
+    await friendRequestService.createFriendRequest(userId, friendId);
+    res.status(200).json({ message: "Friend request sent successfully!" });
   } catch (error) {
-    return res.status(500).json({ error: "Server error" });
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.respondToFriendRequest = async (req, res) => {
+  const { requestId, response } = req.body;
+  try {
+    const updatedRequest = await friendRequestService.respondToFriendRequest(
+      requestId,
+      response
+    );
+    res
+      .status(200)
+      .json({ message: `Friend request ${updatedRequest.status}` });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.getFriendRequests = async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId);
+  try {
+    const requests = await friendRequestService.getFriendRequests(userId);
+    res.status(200).json(requests);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.getRequestsBySenderReceiverids = async (req, res) => {
+  const { userId, friendId } = req.params;
+
+  try {
+    const request = await friendRequestService.getRequestsBySenderReceiverid(
+      userId,
+      friendId
+    );
+    res.status(200).json(request);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -108,7 +159,7 @@ exports.removeFriend = async (req, res) => {
 exports.getFriends = async (req, res) => {
   try {
     const { userId } = req.body;
-    console.log(userId);
+
     const user = await User.findById(userId).populate(
       "friends",
       "name username profilepic"

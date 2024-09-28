@@ -12,7 +12,25 @@ router.post("/logout", userController.logoutUser);
 router.get("/me", authMiddleware, userController.getMe);
 router.post("/admin/password", isAdmin, userController.updateAdminPassword);
 
-router.post("/addFriend", authMiddleware, userController.addFriend);
+// router.post("/addFriend", authMiddleware, userController.addFriend);
+
+router.post("/request/send", authMiddleware, userController.sendFriendRequest);
+router.post(
+  "/request/respond",
+  authMiddleware,
+  userController.respondToFriendRequest
+);
+router.get(
+  "/request/:userId",
+  authMiddleware,
+  userController.getFriendRequests
+);
+
+router.get(
+  "/request/find/:userId/:friendId",
+  authMiddleware,
+  userController.getRequestsBySenderReceiverids
+);
 
 router.post("/removeFriend", authMiddleware, userController.removeFriend);
 
