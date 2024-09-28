@@ -107,7 +107,10 @@ const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => {
                                 </>
                             ) : (
                                 <Button
-                                    onClick={() => onAddFriend(user._id)}
+                                    onClick={() => {
+                                        onAddFriend(user._id)
+                                        setIsRequested(true)
+                                    }}
                                     className="w-full flex items-center justify-center"
                                     variant="default"
                                     disabled={requested}

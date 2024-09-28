@@ -78,6 +78,7 @@ function DashboardPage() {
                 method: "POST",
                 body: JSON.stringify({ "userId": user._id, "friendId": id })
             });
+
             dispatchMessage('success', 'Friend request sent successfully');
             fetchUsers();
         } catch (err) {
@@ -179,6 +180,7 @@ function DashboardPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {activeTab === 'requests' ? (
                     friendRequests?.map((request) => (
+                        //@ts-ignore
                         <FriendRequestCard
                             key={request._id}
                             request={request}
