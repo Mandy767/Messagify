@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-// const morgan = require("morgan");
+const morgan = require("morgan");
 const { store } = require("./config/database");
 const env = require("./config/env");
 const http = require("http");
@@ -13,7 +13,7 @@ const app = express();
 
 const server = http.createServer(app);
 const io = socketSetup(server);
-// app.use(morgan("dev"));
+app.use(morgan("dev"));
 app.use(cookieParser(env.JWT_SECRET));
 
 app.use(

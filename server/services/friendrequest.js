@@ -66,6 +66,7 @@ exports.respondToFriendRequest = async (requestId, response) => {
     await FriendRequest.findByIdAndDelete(requestId);
   } else if (response === "reject") {
     request.status = "rejected";
+    await FriendRequest.findByIdAndDelete(requestId);
   } else {
     throw new Error("Invalid response");
   }
