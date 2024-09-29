@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 import { Send } from 'lucide-react';
 
 function ChatPage() {
-
     const { userId2: friendId } = useParams();
     const [friendData, setFriendData] = useState();
     const [message, setMessage] = useState('');
@@ -32,25 +31,21 @@ function ChatPage() {
         }
     }, []);
 
-
     const requestPastMessages = useCallback(async () => {
         try {
             const data = await sendRequest(`/api/message/messages/${user._id}/${friendId}`, { method: "GET" });
-            setChat(data.data.messages)
-
-
+            setChat(data.data.messages);
         } catch (err) {
-            console.error('Error fetching friend:', err);
+            console.error('Error fetching messages:', err);
         }
     }, []);
 
     useEffect(() => {
         fetchFriend();
-
         requestPastMessages();
 
         if (socket) {
-            console.log('socket connected')
+            console.log('socket connected');
 
             //@ts-ignore
             socket.on('receive_message', (data) => {
@@ -58,17 +53,14 @@ function ChatPage() {
                 setChat((prevChat) => [...prevChat, data]);
             });
 
-
             return () => {
                 //@ts-ignore
                 socket.off('receive_message');
-
             };
         } else {
-            console.log('socket not connected')
+            console.log('socket not connected');
         }
     }, [socket]);
-
 
     useEffect(() => {
         scrollToBottom();
@@ -80,15 +72,15 @@ function ChatPage() {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     };
+
     const handleSendMessage = () => {
         if (message.trim()) {
             const newMessage = {
                 sender: user._id,
                 recipient: friendId,
                 content: message,
-                createdAt: new Date().toLocaleString()
+                createdAt: new Date().toISOString()
             };
-
 
             if (socket) {
                 //@ts-ignore
@@ -101,10 +93,9 @@ function ChatPage() {
     };
 
     //@ts-ignore
-    const groupMessagesByDate = (messages: any) => {
+    const groupMessagesByDate = (messages) => {
         const groups = {};
-        //@ts-ignore
-        messages.forEach((msg) => {
+        messages.forEach((msg: any) => {
             const date = new Date(msg.createdAt).toLocaleDateString();
             //@ts-ignore
             if (!groups[date]) {
@@ -134,6 +125,8 @@ function ChatPage() {
     };
 
     const groupedMessages = groupMessagesByDate(chat);
+    //@ts-ignore
+    const sortedDates = Object.keys(groupedMessages).sort((a, b) => new Date(a) - new Date(b));
 
     return (
         <div className="flex flex-col h-screen bg-gray-100 pt-3">
@@ -150,7 +143,7 @@ function ChatPage() {
             </div>
 
             <div ref={chatContainerRef} className="flex-grow overflow-y-auto p-4">
-                {Object.entries(groupedMessages).reverse().map(([date, messages]) => (
+                {sortedDates.map((date) => (
                     <div key={date}>
                         <div className="flex justify-center my-4">
                             <span className="bg-gray-200 text-gray-600 text-sm font-medium px-3 py-1 rounded-full">
@@ -158,13 +151,13 @@ function ChatPage() {
                             </span>
                         </div>
 
-                        {(messages as any[]).map((msg: any, index: any) => (
+                        {(groupedMessages as any)[date].map((msg: any, index: any) => (
                             <div
                                 key={index}
-                                className={`flex ${msg.sender !== user._id ? 'justify-start' : 'justify-end'} mb-4`}
+                                className={`flex ${(msg as any).sender !== user._id ? 'justify-start' : 'justify-end'} mb-4`}
                             >
                                 <div
-                                    className={`max-w-[70%] rounded-2xl px-4 py-2 break-words ${msg.sender === user._id
+                                    className={`max-w-[70%] rounded-2xl px-4 py-2 break-words ${(msg as any).sender === user._id
                                         ? 'bg-blue-500 text-white'
                                         : 'bg-gray-300 text-black'
                                         }`}
