@@ -92,6 +92,13 @@ function ChatPage() {
         }
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default "Enter" behavior (like submitting a form)
+            handleSendMessage();
+        }
+    };
+
     //@ts-ignore
     const groupMessagesByDate = (messages) => {
         const groups = {};
@@ -162,7 +169,7 @@ function ChatPage() {
                                         : 'bg-gray-300 text-black'
                                         }`}
                                 >
-                                    <p>{msg.content}</p>
+                                    <p className="whitespace-pre-wrap word-break">{msg.content}</p>
                                     <span className="text-xs opacity-70 mt-1 block">
                                         {new Date(msg.createdAt).toLocaleTimeString('en-US', {
                                             hour: 'numeric',
@@ -184,10 +191,12 @@ function ChatPage() {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         className="flex-grow bg-transparent px-4 py-2 focus:outline-none"
+                        onKeyDown={handleKeyDown}
                         placeholder="Message..."
                     />
                     <button
                         onClick={handleSendMessage}
+
                         className="p-2 text-blue-500 hover:text-blue-700 focus:outline-none"
                     >
                         <Send size={24} />
