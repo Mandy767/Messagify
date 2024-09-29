@@ -11,6 +11,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => {
     const [requested, setIsRequested] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // Add loading state
+    const [incoming, SetIsIncoming] = useState(false);
     const sendRequest = useHttpRequest();
     const { user: mainuser } = useAuth();
 
@@ -34,8 +35,27 @@ const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => {
         }
     };
 
+    const fetchIncomingRequest = async () => {
+        try {
+            const data = await sendRequest(`/api/user/request/find/${user._id}/${mainuser._id}`, {
+                method: "GET",
+            });
+
+
+            if (data.data) {
+                SetIsIncoming(true)
+            }
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchRequestedStatus();
+        fetchIncomingRequest();
     }, []);
 
     if (isLoading) {
@@ -113,13 +133,14 @@ const UserCard = ({ user, onAddFriend, onRemoveFriend, onMessage }) => {
                                     }}
                                     className="w-full flex items-center justify-center"
                                     variant="default"
-                                    disabled={requested}
+                                    disabled={requested || incoming}
+
                                 >
                                     {requested ? (<span>Requested</span>) :
-                                        (<>
+                                        incoming ? (<span>Already sent by me !!</span>) : (<>
                                             <UserPlus className="mr-2" size={18} />
-                                            Add Friend</>
-                                        )}
+                                            Add Friend</>)}
+
 
                                 </Button>
                             )}
