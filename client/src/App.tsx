@@ -12,6 +12,7 @@ import Layout from './layout/Layout';
 import { NavbarProvider } from './store/NavbarContext';
 import ChatPage from './pages/ChatPage';
 import { IsOnlineProvider } from './store/IsOnlineContext';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="*" element={<NotFound />} />
                 <Route path="/login" element={<ProtectedRoute><LoginPage /></ProtectedRoute>} />
                 <Route path="/register" element={<ProtectedRoute><RegisterPage /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
