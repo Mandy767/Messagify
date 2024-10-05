@@ -1,7 +1,39 @@
+const crypto = require("crypto");
 const Message = require("../models/message");
 const User = require("../models/user");
+const env = require("../config/env");
 
 class MessageServices {
+  constructor() {
+    this.encryptionKey = crypto.scryptSync(env.MESSAGE_SECRET_KEY, "salt", 32);
+  }
+
+  encrypt(text) {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(
+      env.ALGORITHM,
+      Buffer.from(this.encryptionKey),
+      iv
+    );
+    let encrypted = cipher.update(text);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return iv.toString("hex") + ":" + encrypted.toString("hex");
+  }
+
+  decrypt(text) {
+    const textParts = text.split(":");
+    const iv = Buffer.from(textParts.shift(), "hex");
+    const encryptedText = Buffer.from(textParts.join(":"), "hex");
+    const decipher = crypto.createDecipheriv(
+      env.ALGORITHM,
+      Buffer.from(this.encryptionKey),
+      iv
+    );
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  }
+
   async createMessage(senderId, recipientId, content) {
     try {
       const sender = await User.findById(senderId);
@@ -11,10 +43,12 @@ class MessageServices {
         throw new Error("Invalid users");
       }
 
+      const encryptedContent = this.encrypt(content);
+
       const message = new Message({
         sender: senderId,
         recipient: recipientId,
-        content,
+        content: encryptedContent,
       });
 
       await message.save();
@@ -36,7 +70,12 @@ class MessageServices {
         .sort({ createdAt: 1 })
         .exec();
 
-      return messages;
+      const decryptedMessages = messages.map((message) => ({
+        ...message.toObject(),
+        content: this.decrypt(message.content),
+      }));
+
+      return decryptedMessages;
     } catch (err) {
       throw new Error(`Failed to retrieve messages: ${err.message}`);
     }

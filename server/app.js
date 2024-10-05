@@ -7,7 +7,7 @@ const { store } = require("./config/database");
 const env = require("./config/env");
 const http = require("http");
 const router = require("./routes/router");
-const errorHandler = require("./middlewares/errorHandler");
+const errorHandler = require("./middlewares/errorhandler");
 const socketSetup = require("./services/socket");
 const app = express();
 
